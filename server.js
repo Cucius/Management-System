@@ -4,15 +4,21 @@ const express = require("express");
 const sequelize = require("./config/connection");
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-sequelize.sync({ force: false }).then((err) => {
-  if (err) throw err;
+sequelize.sync().then(
+  () => {
+    app.listen(PORT, () => console.log("Now listening"));
 
-  promptUser();
-});
+    promptUser();
+  },
+  (err) => {
+    if (err) throw err;
+  }
+);
 
 const promptUser = () => {
   inquirer
@@ -31,7 +37,7 @@ const promptUser = () => {
       },
     ])
     .then(function (res) {
-      console.log(`You have chosen to ${toLowerCase(res.action)} a ${toLowerCase(res.option)}`);
+      console.log(`You have chosen to ${res.action} a ${res.option}`);
 
       switch (res.action) {
         case "Add":
