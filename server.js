@@ -1,7 +1,7 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const express = require("express");
-const sequelize = require("./config/connection");
+const db = require("./config/connection");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-sequelize.sync().then(
+db.connect(
   () => {
     app.listen(PORT, () => console.log("Now listening"));
 
@@ -59,11 +59,11 @@ const promptUser = () => {
     });
 };
 
-const readData = () => {
+const readData = (res) => {
   switch (res) {
     case "Employee":
       console.log("Showing all employees...\n");
-      sequelize.query("SELECT * FROM employee", function (err, res) {
+      db.query(`SELECT * FROM employee;`, function (err, res) {
         if (err) throw err;
 
         console.table(res);
@@ -73,17 +73,16 @@ const readData = () => {
       break;
     case "Role":
       console.log("Showing all roles...\n");
-      sequelize.query("SELECT * FROM role", function (err, res) {
+      db.query(`SELECT * FROM role;`, function (err, res) {
         if (err) throw err;
 
         console.table(res);
-
         nextPrompt();
       });
       break;
     case "Department":
       console.log("Showing all departments...\n");
-      sequelize.query("SELECT * FROM department", function (err, res) {
+      db.query(`SELECT * FROM department;`, function (err, res) {
         if (err) throw err;
 
         console.table(res);
@@ -104,6 +103,6 @@ const nextPrompt = async () => {
   if (answer.continue === true) {
     promptUser();
   } else {
-    sequelize.close();
+    db.end();
   }
 };
