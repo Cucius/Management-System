@@ -8,13 +8,13 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-sequelize.connect(function (err) {
+sequelize.sync({ force: false }).then((err) => {
   if (err) throw err;
 
   promptUser();
 });
 
-const promptUser = async () => {
+const promptUser = () => {
   inquirer
     .prompt([
       {
@@ -48,7 +48,56 @@ const promptUser = async () => {
           break;
       }
     })
-    .catch(function (err) {
+    .catch((err) => {
       console.error(err);
     });
+};
+
+const readData = () => {
+  switch (res) {
+    case "Employee":
+      console.log("Showing all employees...\n");
+      sequelize.query("SELECT * FROM employee", function (err, res) {
+        if (err) throw err;
+
+        console.table(res);
+
+        nextPrompt();
+      });
+      break;
+    case "Role":
+      console.log("Showing all roles...\n");
+      sequelize.query("SELECT * FROM role", function (err, res) {
+        if (err) throw err;
+
+        console.table(res);
+
+        nextPrompt();
+      });
+      break;
+    case "Department":
+      console.log("Showing all departments...\n");
+      sequelize.query("SELECT * FROM department", function (err, res) {
+        if (err) throw err;
+
+        console.table(res);
+
+        nextPrompt();
+      });
+      break;
+  }
+};
+
+const nextPrompt = async () => {
+  let answer = await inquirer.prompt({
+    type: "confirm",
+    message: "Do you want to continue?",
+    default: false,
+    name: "continue",
+  });
+  if (answer.continue === true) {
+    promptUser();
+  } else {
+    sequelize.close();
+  }
 };
