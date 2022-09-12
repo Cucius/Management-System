@@ -61,8 +61,28 @@ const runCommand = {
   },
   role: async () => {
     console.log(`You have chosen to role`);
-    await promptUser();
+    db.query(
+      `SELECT * FROM role;
+         `,
+      (req, res) => {
+        console.table(res);
+        nextPrompt();
+      },
+    );
+    return;
   },
+
+  department: async () => {
+    console.log(`You have chosen to department`);
+    db.query(
+      `SELECT * FROM department;
+         `,
+      (req, res) => {
+        console.table(res);
+        nextPrompt();
+      },
+  
+      
 };
 
 const promptUser = async () => {
