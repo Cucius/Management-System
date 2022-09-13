@@ -3,6 +3,7 @@ const mysql = require("mysql2");
 const express = require("express");
 const db = require("./config/connection");
 const path = require("path");
+const { async } = require("rxjs");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -26,13 +27,61 @@ const questions = [
     type: "list",
     name: "menu",
     message: "What would you like to do?",
-    choices: ["employee", "role", "department", "test"],
+    choices: [
+      //VIEW
+      { name: "View All Employees", value: "employee" },
+      { name: "View All Roles", value: "role" },
+      { name: "View All Departments", value: "department" },
+      //ADD
+      { name: "Add Employee", value: "addEmployee" },
+      { name: "Add Role", value: "addRole" },
+      { name: "Add Department", value: "addDepartment" },
+
+      "test",
+    ],
+  },
+];
+
+const addDepartment = [
+  {
+    type: "input",
+    message: "Add The Department:",
+    name: "addName",
+  },
+];
+const addRole = [
+  {
+    type: "input",
+    message: "Add The Role:",
+    name: "addTitle",
+  },
+  {
+    type: "input",
+    message: "Add the Salary:",
+    name: "addSalary",
+  },
+];
+const addEmployee = [
+  {
+    type: "input",
+    message: "Add The First Name:",
+    name: "addFirstName",
+  },
+  {
+    type: "input",
+    message: "Add The Last Name:",
+    name: "addLastName",
+  },
+  {
+    type: "list",
+    message: "What Role:",
+    choices: [],
+    name: "addRole",
   },
 ];
 
 const runCommand = {
   employee: async () => {
-    console.log(`You have chosen to employee`);
     db.query(
       `SELECT 
       emp.id AS 'id',
@@ -62,8 +111,9 @@ const runCommand = {
     );
     return;
   },
+  addEmployee: async () => {},
+
   role: async () => {
-    console.log(`You have chosen to role`);
     db.query(
       `SELECT role.id,
       title,
@@ -82,14 +132,39 @@ const runCommand = {
     );
     return;
   },
+  addRole: async () => {
+    const answer = await inquirer.prompt(addRole);
+    db.query(
+      `INSERT INTO role (title, salary)
+      VALUES ('${answer.addTitle}', ${answer.addTitle});
+      `,
+      (req, res) => {
+        console.log(`Added ${answer.addTitle} to the database`);
+        nextPrompt();
+      }
+    );
+    return;
+  },
 
   department: async () => {
-    console.log(`You have chosen to department`);
     db.query(
       `SELECT department.id, department.name AS department FROM department;
          `,
       (req, res) => {
         console.table(res);
+        nextPrompt();
+      }
+    );
+    return;
+  },
+  addDepartment: async () => {
+    const answer = await inquirer.prompt(addDepartment);
+    db.query(
+      `INSERT INTO department (name)
+      VALUES ('${answer.addName}');
+      `,
+      (req, res) => {
+        console.log(`Added ${answer.addName} to the database`);
         nextPrompt();
       }
     );
