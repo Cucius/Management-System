@@ -3,7 +3,6 @@ const mysql = require("mysql2");
 const express = require("express");
 const db = require("./config/connection");
 const path = require("path");
-const { async } = require("rxjs");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -49,6 +48,7 @@ const addDepartment = [
     name: "addName",
   },
 ];
+
 const addRole = [
   {
     type: "input",
@@ -60,7 +60,14 @@ const addRole = [
     message: "Add the Salary:",
     name: "addSalary",
   },
+  {
+    type: "list",
+    message: "What Role:",
+    choices: role,
+    name: "addDepartment",
+  },
 ];
+
 const addEmployee = [
   {
     type: "input",
@@ -193,3 +200,9 @@ const nextPrompt = async () => {
     promptUser();
   }
 };
+
+// let roleChoices = async () =>
+//   db.query("SELECT department.id FROM department;", (req, res) => {
+//     const entries = Object.keys(res);
+//     console.log(entries);
+//   });
