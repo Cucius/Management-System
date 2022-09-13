@@ -31,49 +31,29 @@ const questions = [
 ];
 
 const runCommand = {
-  test: async () => {
-    console.log(`You have chosen test`);
-    db.query(
-      `SELECT emp.first_name,
-      
-      CONCAT(m.last_name,', ',m.first_name)AS 'manager',
-      emp.id AS 'id'
-      
-
-      FROM employee emp 
-      JOIN employee m ON m.id = emp.manager_id      
-      ;
-         `,
-      (req, res) => {
-        console.table(res);
-        nextPrompt();
-      }
-    );
-    return;
-  },
   employee: async () => {
     console.log(`You have chosen to employee`);
     db.query(
       `SELECT 
-      employee.id AS id,
-          first_name,
-          last_name,
+      emp.id AS 'id',
+      emp.first_name,
+      emp.last_name,
+      emp.role_id AS title,
+      
+      title AS title,
           
-          role_id AS title,
-          title AS title,
-          
-          salary,
-          
-          department_id AS department,
-          name AS department,
+      department_id AS department,
+      name AS department,
+      
+      salary,
   
-          manager_id AS manager
+      CONCAT(m.last_name,', ',m.first_name)AS 'manager'
 
-          FROM employee
-          
-          JOIN role ON employee.role_id = role.id
-          JOIN department ON role.department_id = department.id
-          ;
+      FROM employee emp 
+      LEFT JOIN employee m ON m.id = emp.manager_id                
+      JOIN role ON emp.role_id = role.id
+      JOIN department ON role.department_id = department.id
+      ORDER BY id;
          `,
       (req, res) => {
         console.table(res);
@@ -92,6 +72,7 @@ const runCommand = {
       name AS department
       FROM role         
       JOIN department ON role.department_id = department.id
+      ORDER BY id
       ;
          `,
       (req, res) => {
